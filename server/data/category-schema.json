@@ -1,0 +1,744 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "documentType": "marketplace-category-configuration-reference",
+  "schemaVersion": "1.0.0",
+  "currency": "PKR",
+  "notes": [
+    "This is an application configuration example, not a JSON Schema validator document.",
+    "Stable option IDs are stored; labels are localized separately.",
+    "Every published listing stores the category schema version used for validation.",
+    "Amounts are stored in minor units and areas are normalized to square metres in addition to the seller-selected unit."
+  ],
+  "fieldTypes": [
+    "text",
+    "textarea",
+    "integer",
+    "decimal",
+    "money",
+    "boolean",
+    "single_select",
+    "multi_select",
+    "reference_select",
+    "range",
+    "date",
+    "location",
+    "media"
+  ],
+  "commonListingFields": [
+    {
+      "key": "title",
+      "type": "text",
+      "required": true,
+      "validation": { "minLength": 10, "maxLength": 100 },
+      "searchable": true,
+      "moderation": ["prohibited_terms", "contact_details", "spam"]
+    },
+    {
+      "key": "description",
+      "type": "textarea",
+      "required": true,
+      "validation": { "minLength": 20, "maxLength": 5000 },
+      "searchable": true,
+      "moderation": ["prohibited_terms", "contact_details", "external_links", "spam"]
+    },
+    {
+      "key": "price",
+      "type": "money",
+      "required": true,
+      "validation": { "minMinor": 0, "maxMinor": 999999999999 },
+      "facetable": true,
+      "sortable": true,
+      "moderation": ["price_anomaly"]
+    },
+    {
+      "key": "price_type",
+      "type": "single_select",
+      "required": true,
+      "options": ["fixed", "negotiable", "range", "free", "contact_for_price"],
+      "facetable": true
+    },
+    {
+      "key": "location_id",
+      "type": "location",
+      "required": true,
+      "searchable": true,
+      "facetable": true
+    },
+    {
+      "key": "media",
+      "type": "media",
+      "required": true,
+      "validation": { "minItems": 1, "maxItems": 12 },
+      "moderation": ["malware", "unsafe_image", "ocr_policy", "perceptual_duplicate"]
+    }
+  ],
+  "areaUnits": {
+    "square_metre": { "toSquareMetres": 1 },
+    "square_foot": { "toSquareMetres": 0.09290304 },
+    "square_yard": { "toSquareMetres": 0.83612736 },
+    "marla": {
+      "conversionPolicy": "market-configured",
+      "reason": "Marla size can vary by locality and business convention; retain original value/unit and apply a reviewed market conversion."
+    },
+    "kanal": {
+      "conversionPolicy": "20_marla_using_same_market_conversion"
+    }
+  },
+  "categories": [
+    {
+      "id": "mobiles.mobile_phones",
+      "label": "Mobile Phones",
+      "listingKind": "good",
+      "priceTypesAllowed": ["fixed", "negotiable"],
+      "fields": [
+        {
+          "key": "brand_id",
+          "type": "reference_select",
+          "referenceCatalog": "mobile_brands",
+          "required": true,
+          "facetable": true,
+          "searchable": true
+        },
+        {
+          "key": "model_id",
+          "type": "reference_select",
+          "referenceCatalog": "mobile_models",
+          "required": true,
+          "dependsOn": "brand_id",
+          "facetable": true,
+          "searchable": true
+        },
+        {
+          "key": "condition",
+          "type": "single_select",
+          "required": true,
+          "options": ["new", "open_box", "used", "refurbished", "for_parts"],
+          "facetable": true
+        },
+        {
+          "key": "pta_status",
+          "type": "single_select",
+          "required": true,
+          "options": ["pta_approved", "non_pta", "not_applicable"],
+          "facetable": true,
+          "moderation": ["pta_claim_consistency"]
+        },
+        {
+          "key": "storage_gb",
+          "type": "integer",
+          "required": false,
+          "validation": { "min": 1, "max": 4096 },
+          "facetable": true
+        },
+        {
+          "key": "ram_gb",
+          "type": "integer",
+          "required": false,
+          "validation": { "min": 1, "max": 128 },
+          "facetable": true
+        },
+        {
+          "key": "warranty",
+          "type": "single_select",
+          "required": false,
+          "options": ["none", "seller", "local_manufacturer", "international"],
+          "facetable": true
+        }
+      ]
+    },
+    {
+      "id": "vehicles.cars",
+      "label": "Cars",
+      "listingKind": "vehicle",
+      "priceTypesAllowed": ["fixed", "negotiable", "contact_for_price"],
+      "fields": [
+        {
+          "key": "make_id",
+          "type": "reference_select",
+          "referenceCatalog": "car_makes",
+          "required": true,
+          "facetable": true,
+          "searchable": true
+        },
+        {
+          "key": "model_id",
+          "type": "reference_select",
+          "referenceCatalog": "car_models",
+          "required": true,
+          "dependsOn": "make_id",
+          "facetable": true,
+          "searchable": true
+        },
+        {
+          "key": "variant_id",
+          "type": "reference_select",
+          "referenceCatalog": "car_variants",
+          "required": false,
+          "dependsOn": "model_id",
+          "facetable": true
+        },
+        {
+          "key": "condition",
+          "type": "single_select",
+          "required": true,
+          "options": ["new", "used"],
+          "facetable": true
+        },
+        {
+          "key": "model_year",
+          "type": "integer",
+          "required": true,
+          "validation": { "min": 1900, "maxExpression": "current_year_plus_1" },
+          "facetable": true,
+          "sortable": true
+        },
+        {
+          "key": "mileage_km",
+          "type": "integer",
+          "required": true,
+          "validation": { "min": 0, "max": 3000000 },
+          "facetable": true,
+          "sortable": true,
+          "moderation": ["mileage_anomaly"]
+        },
+        {
+          "key": "fuel",
+          "type": "single_select",
+          "required": true,
+          "options": ["petrol", "diesel", "cng", "lpg", "hybrid", "phev", "reev", "electric"],
+          "facetable": true
+        },
+        {
+          "key": "transmission",
+          "type": "single_select",
+          "required": true,
+          "options": ["manual", "automatic"],
+          "facetable": true
+        },
+        {
+          "key": "body_type",
+          "type": "single_select",
+          "required": true,
+          "options": ["small_city_car", "hatchback", "sedan", "suv", "mpv", "pickup", "van_bus", "estate", "sports_coupe", "convertible", "other"],
+          "facetable": true
+        },
+        {
+          "key": "registration_city_id",
+          "type": "reference_select",
+          "referenceCatalog": "vehicle_registration_locations",
+          "required": true,
+          "facetable": true
+        },
+        {
+          "key": "documents",
+          "type": "single_select",
+          "required": true,
+          "options": ["original", "duplicate", "not_available"],
+          "facetable": true
+        },
+        {
+          "key": "assembly",
+          "type": "single_select",
+          "required": true,
+          "options": ["local", "imported"],
+          "facetable": true
+        },
+        {
+          "key": "color",
+          "type": "single_select",
+          "required": false,
+          "optionSource": "managed_color_palette",
+          "facetable": true
+        },
+        {
+          "key": "seats",
+          "type": "integer",
+          "required": false,
+          "validation": { "min": 1, "max": 60 },
+          "facetable": true
+        },
+        {
+          "key": "owners",
+          "type": "integer",
+          "required": false,
+          "validation": { "min": 0, "max": 50 }
+        },
+        {
+          "key": "features",
+          "type": "multi_select",
+          "required": false,
+          "optionSource": "car_features",
+          "facetable": true
+        }
+      ]
+    },
+    {
+      "id": "bikes.motorcycles",
+      "label": "Motorcycles",
+      "listingKind": "vehicle",
+      "priceTypesAllowed": ["fixed", "negotiable", "contact_for_price"],
+      "fields": [
+        {
+          "key": "make_id",
+          "type": "reference_select",
+          "referenceCatalog": "motorcycle_makes",
+          "required": true,
+          "facetable": true
+        },
+        {
+          "key": "model_id",
+          "type": "reference_select",
+          "referenceCatalog": "motorcycle_models",
+          "required": true,
+          "dependsOn": "make_id",
+          "facetable": true
+        },
+        {
+          "key": "model_year",
+          "type": "integer",
+          "required": true,
+          "validation": { "min": 1900, "maxExpression": "current_year_plus_1" },
+          "facetable": true
+        },
+        {
+          "key": "condition",
+          "type": "single_select",
+          "required": true,
+          "options": ["new", "used"],
+          "facetable": true
+        },
+        {
+          "key": "mileage_km",
+          "type": "integer",
+          "required": false,
+          "validation": { "min": 0, "max": 1000000 },
+          "facetable": true
+        },
+        {
+          "key": "engine_cc",
+          "type": "integer",
+          "required": false,
+          "validation": { "min": 20, "max": 3000 },
+          "facetable": true
+        },
+        {
+          "key": "registration_city_id",
+          "type": "reference_select",
+          "referenceCatalog": "vehicle_registration_locations",
+          "required": false,
+          "facetable": true
+        },
+        {
+          "key": "documents",
+          "type": "single_select",
+          "required": false,
+          "options": ["original", "duplicate", "not_available"],
+          "facetable": true
+        }
+      ]
+    },
+    {
+      "id": "property_for_sale.houses",
+      "label": "Houses for Sale",
+      "listingKind": "property",
+      "priceTypesAllowed": ["fixed", "negotiable", "contact_for_price"],
+      "fields": [
+        {
+          "key": "furnishing",
+          "type": "single_select",
+          "required": true,
+          "options": ["furnished", "semi_furnished", "unfurnished"],
+          "facetable": true
+        },
+        {
+          "key": "bedrooms",
+          "type": "integer",
+          "required": true,
+          "validation": { "min": 0, "max": 100 },
+          "facetable": true
+        },
+        {
+          "key": "bathrooms",
+          "type": "integer",
+          "required": true,
+          "validation": { "min": 0, "max": 100 },
+          "facetable": true
+        },
+        {
+          "key": "construction_state",
+          "type": "single_select",
+          "required": true,
+          "options": ["finished", "grey_structure", "under_construction"],
+          "facetable": true
+        },
+        {
+          "key": "area_value",
+          "type": "decimal",
+          "required": true,
+          "validation": { "exclusiveMin": 0, "max": 1000000000 },
+          "facetable": true,
+          "sortable": true
+        },
+        {
+          "key": "area_unit",
+          "type": "single_select",
+          "required": true,
+          "options": ["marla", "kanal", "square_foot", "square_yard", "square_metre"],
+          "facetable": true
+        },
+        {
+          "key": "area_square_metres",
+          "type": "decimal",
+          "required": true,
+          "computed": true,
+          "facetable": true,
+          "sortable": true
+        },
+        {
+          "key": "features",
+          "type": "multi_select",
+          "required": false,
+          "options": ["kitchen", "drawing_room", "dining_room", "lounge", "store_room", "laundry_room", "powder_room", "study_room", "servant_quarters", "prayer_room", "steam_room", "gym"],
+          "facetable": true
+        }
+      ]
+    },
+    {
+      "id": "property_for_rent.apartments",
+      "label": "Apartments and Flats for Rent",
+      "listingKind": "property",
+      "priceTypesAllowed": ["fixed", "negotiable", "contact_for_price"],
+      "fields": [
+        {
+          "key": "rent_period",
+          "type": "single_select",
+          "required": true,
+          "options": ["daily", "weekly", "monthly", "yearly"],
+          "facetable": true
+        },
+        {
+          "key": "furnishing",
+          "type": "single_select",
+          "required": true,
+          "options": ["furnished", "semi_furnished", "unfurnished"],
+          "facetable": true
+        },
+        {
+          "key": "bedrooms",
+          "type": "integer",
+          "required": true,
+          "validation": { "min": 0, "max": 100 },
+          "facetable": true
+        },
+        {
+          "key": "bathrooms",
+          "type": "integer",
+          "required": true,
+          "validation": { "min": 0, "max": 100 },
+          "facetable": true
+        },
+        {
+          "key": "floor_level",
+          "type": "integer",
+          "required": false,
+          "validation": { "min": -10, "max": 300 },
+          "facetable": true
+        },
+        {
+          "key": "area_value",
+          "type": "decimal",
+          "required": true,
+          "validation": { "exclusiveMin": 0, "max": 1000000000 },
+          "facetable": true
+        },
+        {
+          "key": "area_unit",
+          "type": "single_select",
+          "required": true,
+          "options": ["marla", "kanal", "square_foot", "square_yard", "square_metre"],
+          "facetable": true
+        },
+        {
+          "key": "area_square_metres",
+          "type": "decimal",
+          "required": true,
+          "computed": true,
+          "facetable": true,
+          "sortable": true
+        },
+        {
+          "key": "features",
+          "type": "multi_select",
+          "required": false,
+          "options": ["kitchen", "drawing_room", "dining_room", "lounge", "store_room", "laundry_room", "powder_room", "study_room", "servant_quarters", "prayer_room", "steam_room", "gym"],
+          "facetable": true
+        }
+      ]
+    },
+    {
+      "id": "property_for_sale.land_plots",
+      "label": "Land and Plots for Sale",
+      "listingKind": "property",
+      "priceTypesAllowed": ["fixed", "negotiable", "contact_for_price"],
+      "fields": [
+        {
+          "key": "plot_type",
+          "type": "single_select",
+          "required": true,
+          "options": ["residential_plot", "commercial_plot", "file", "plot_form", "agricultural_land", "industrial_land"],
+          "facetable": true
+        },
+        {
+          "key": "area_value",
+          "type": "decimal",
+          "required": true,
+          "validation": { "exclusiveMin": 0, "max": 1000000000 },
+          "facetable": true
+        },
+        {
+          "key": "area_unit",
+          "type": "single_select",
+          "required": true,
+          "options": ["marla", "kanal", "square_foot", "square_yard", "square_metre"],
+          "facetable": true
+        },
+        {
+          "key": "area_square_metres",
+          "type": "decimal",
+          "required": true,
+          "computed": true,
+          "facetable": true,
+          "sortable": true
+        },
+        {
+          "key": "features",
+          "type": "multi_select",
+          "required": false,
+          "options": ["electricity", "water_supply", "sewerage", "boundary_wall", "gas_supply", "corner_plot", "park_facing"],
+          "facetable": true
+        },
+        {
+          "key": "ownership_status",
+          "type": "single_select",
+          "required": false,
+          "options": ["registered", "allotment", "file", "lease", "other"],
+          "moderation": ["property_claim_policy"]
+        }
+      ]
+    },
+    {
+      "id": "jobs.generic",
+      "label": "Jobs",
+      "listingKind": "job",
+      "priceTypesAllowed": [],
+      "overrideCommonFields": {
+        "price": { "enabled": false },
+        "price_type": { "enabled": false },
+        "media": { "required": false, "validation": { "minItems": 0, "maxItems": 8 } }
+      },
+      "fields": [
+        {
+          "key": "employer_name",
+          "type": "text",
+          "required": true,
+          "validation": { "minLength": 2, "maxLength": 120 },
+          "searchable": true,
+          "moderation": ["employer_impersonation"]
+        },
+        {
+          "key": "position_type",
+          "type": "single_select",
+          "required": true,
+          "options": ["full_time", "part_time", "contract", "temporary", "internship", "commission_only"],
+          "facetable": true
+        },
+        {
+          "key": "workplace_mode",
+          "type": "single_select",
+          "required": true,
+          "options": ["onsite", "hybrid", "remote"],
+          "facetable": true
+        },
+        {
+          "key": "salary_min_minor",
+          "type": "money",
+          "required": false,
+          "validation": { "minMinor": 0, "maxMinor": 999999999999 },
+          "facetable": true
+        },
+        {
+          "key": "salary_max_minor",
+          "type": "money",
+          "required": false,
+          "validation": { "minMinor": 0, "maxMinor": 999999999999, "gteField": "salary_min_minor" },
+          "facetable": true
+        },
+        {
+          "key": "salary_period",
+          "type": "single_select",
+          "required": false,
+          "options": ["hourly", "daily", "weekly", "monthly", "yearly", "project"],
+          "facetable": true
+        },
+        {
+          "key": "experience_min_years",
+          "type": "decimal",
+          "required": false,
+          "validation": { "min": 0, "max": 80 },
+          "facetable": true
+        },
+        {
+          "key": "education_level",
+          "type": "single_select",
+          "required": false,
+          "options": ["none", "primary", "matric", "intermediate", "diploma", "bachelors", "masters", "doctorate", "other"],
+          "facetable": true
+        },
+        {
+          "key": "application_method",
+          "type": "single_select",
+          "required": true,
+          "options": ["platform_chat", "verified_phone", "verified_email", "external_ats"],
+          "moderation": ["recruitment_scam"]
+        },
+        {
+          "key": "application_deadline",
+          "type": "date",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "services.generic",
+      "label": "Services",
+      "listingKind": "service",
+      "priceTypesAllowed": ["fixed", "range", "negotiable", "contact_for_price"],
+      "fields": [
+        {
+          "key": "provider_type",
+          "type": "single_select",
+          "required": true,
+          "options": ["individual", "business"],
+          "facetable": true
+        },
+        {
+          "key": "price_model",
+          "type": "single_select",
+          "required": true,
+          "options": ["fixed", "hourly", "daily", "per_visit", "per_project", "starting_from", "quote_required"],
+          "facetable": true
+        },
+        {
+          "key": "service_area_ids",
+          "type": "multi_select",
+          "required": true,
+          "optionSource": "locations_with_radius_option",
+          "facetable": true
+        },
+        {
+          "key": "availability",
+          "type": "multi_select",
+          "required": false,
+          "options": ["weekdays", "weekends", "evenings", "twenty_four_seven", "appointment_only"]
+        },
+        {
+          "key": "credential_claims",
+          "type": "multi_select",
+          "required": false,
+          "optionSource": "category_specific_credentials",
+          "moderation": ["credential_verification_if_regulated"]
+        }
+      ]
+    },
+    {
+      "id": "commerce.delivery_good",
+      "label": "Delivery-Eligible New Product",
+      "listingKind": "commerce_good",
+      "eligibility": [
+        "verified_business_seller",
+        "supported_category",
+        "new_condition",
+        "fixed_price",
+        "valid_return_policy",
+        "serviceable_pickup_location"
+      ],
+      "priceTypesAllowed": ["fixed"],
+      "fields": [
+        {
+          "key": "seller_sku",
+          "type": "text",
+          "required": true,
+          "validation": { "minLength": 1, "maxLength": 80 },
+          "uniqueWithin": "organization"
+        },
+        {
+          "key": "stock_quantity",
+          "type": "integer",
+          "required": true,
+          "validation": { "min": 0, "max": 10000000 }
+        },
+        {
+          "key": "compare_at_price_minor",
+          "type": "money",
+          "required": false,
+          "validation": { "minMinor": 0, "gteCommonField": "price" },
+          "moderation": ["discount_truthfulness"]
+        },
+        {
+          "key": "weight_grams",
+          "type": "integer",
+          "required": true,
+          "validation": { "min": 1, "max": 10000000 }
+        },
+        {
+          "key": "length_mm",
+          "type": "integer",
+          "required": true,
+          "validation": { "min": 1, "max": 100000 }
+        },
+        {
+          "key": "width_mm",
+          "type": "integer",
+          "required": true,
+          "validation": { "min": 1, "max": 100000 }
+        },
+        {
+          "key": "height_mm",
+          "type": "integer",
+          "required": true,
+          "validation": { "min": 1, "max": 100000 }
+        },
+        {
+          "key": "warranty_policy_id",
+          "type": "reference_select",
+          "referenceCatalog": "organization_warranty_policies",
+          "required": false
+        },
+        {
+          "key": "return_policy_id",
+          "type": "reference_select",
+          "referenceCatalog": "organization_return_policies",
+          "required": true
+        },
+        {
+          "key": "tax_class_id",
+          "type": "reference_select",
+          "referenceCatalog": "tax_classes",
+          "required": true
+        }
+      ]
+    }
+  ],
+  "configurationGovernance": {
+    "workflow": ["draft", "peer_review", "policy_review", "staged_publish", "active", "deprecated"],
+    "requiredApprovals": ["product", "engineering", "trust_and_safety"],
+    "additionalApprovalsByRisk": ["legal", "tax", "payments", "wildlife_or_regulated_category_expert"],
+    "migrationRules": [
+      "Never reuse a stable field or option ID for a different meaning.",
+      "Additive optional fields are backward compatible.",
+      "Changing validation or required status creates a new category schema version.",
+      "Published listings keep their original values; revalidation occurs only under an explicit migration or material edit policy.",
+      "Search projection must understand all active and retained schema versions."
+    ]
+  }
+}

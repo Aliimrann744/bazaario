@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { -webkit-font-smoothing: antialiased; }
+  body {
+    @apply bg-page text-ink font-sans antialiased;
+  }
+  * { scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
+  *::-webkit-scrollbar { height: 8px; width: 8px; }
+  *::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+}
+
+@layer components {
+  .container-page { @apply mx-auto w-full max-w-7xl px-4 sm:px-6; }
+
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed; }
+  .btn-primary { @apply btn bg-brand-gradient text-white shadow-glow hover:shadow-hover hover:-translate-y-0.5; }
+  .btn-accent { @apply btn bg-gold-gradient text-white shadow-glow hover:-translate-y-0.5; }
+  .btn-outline { @apply btn border border-line bg-white text-ink hover:border-brand-300 hover:bg-brand-50; }
+  .btn-ghost { @apply btn text-ink hover:bg-slate-100; }
+
+  .card { @apply rounded-card bg-white shadow-card; }
+  .chip { @apply inline-flex items-center gap-1.5 rounded-full border border-line bg-white px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:border-brand-300 hover:bg-brand-50; }
+  .chip-active { @apply border-brand-500 bg-brand-50 text-brand-700; }
+
+  .input { @apply w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-slate-400 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10; }
+  .label { @apply mb-1.5 block text-sm font-semibold text-ink; }
+
+  .skeleton { @apply relative overflow-hidden bg-slate-100; }
+  .skeleton::after { content: ''; @apply absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/70 to-transparent; }
+
+  .badge { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold; }
+  .badge-featured { @apply badge bg-gold-gradient text-white shadow-sm; }
+  .badge-verified { @apply badge bg-brand-50 text-brand-700; }
+}
+
+/* 3D tilt helper for featured cards */
+.tilt { transform-style: preserve-3d; perspective: 800px; }

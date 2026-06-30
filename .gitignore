@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Builds
+client/dist/
+mobile/.expo/
+mobile/dist/
+**/build/
+
+# Env
+.env
+**/.env
+!**/.env.example
+
+# Database
+server/data/*.sqlite
+server/data/*.sqlite-journal
+
+# Logs / OS
+*.log
+.DS_Store
+Thumbs.db
