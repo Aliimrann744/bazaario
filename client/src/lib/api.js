@@ -3,7 +3,13 @@ import axios from 'axios';
 // Use the dev proxy (/api) unless an absolute URL is configured.
 const baseURL = (import.meta.env.VITE_API_URL || '/api') + '/v1';
 
-const api = axios.create({ baseURL, timeout: 20000 });
+// ngrok's free tier serves a browser "warning" interstitial page (with NO CORS
+// headers) for browser-looking requests. Sending this header on every request
+// tells ngrok to skip it and forward straight to our API, so the browser gets
+// our real (CORS-enabled) response instead of a headerless HTML page.
+const defaultHeaders = { 'ngrok-skip-browser-warning': 'true' };
+
+const api = axios.create({ baseURL, timeout: 20000, headers: defaultHeaders });
 
 let accessToken = localStorage.getItem('bz_access') || null;
 let refreshToken = localStorage.getItem('bz_refresh') || null;
@@ -36,7 +42,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && refreshToken && !original._retry) {
       original._retry = true;
       try {
-        refreshing = refreshing || axios.post(`${baseURL}/auth/refresh`, { refreshToken });
+        refreshing = refreshing || axios.post(`${baseURL}/auth/refresh`, { refreshToken }, { headers: defaultHeaders });
         const { data } = await refreshing;
         refreshing = null;
         setTokens(data.accessToken);

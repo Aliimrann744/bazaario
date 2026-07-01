@@ -10,13 +10,17 @@ const { notFound, errorHandler } = require('./middleware/error');
 const app = express();
 
 app.use(helmet({ crossOriginResourcePolicy: false }));
-app.use(cors({
-  origin(origin, cb) {
-    if (!origin || config.corsOrigins.includes(origin) || config.env !== 'production') return cb(null, true);
-    return cb(null, false);
-  },
+
+const corsOptions = {
+  origin: true,
   credentials: true,
-}));
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'],
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 app.use(express.json({ limit: '2mb' }));
 app.use(morgan(config.env === 'production' ? 'combined' : 'dev'));
 

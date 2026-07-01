@@ -12,7 +12,7 @@ const config = {
     accessTtl: parseInt(process.env.ACCESS_TOKEN_TTL || '900', 10), // seconds
     refreshTtl: parseInt(process.env.REFRESH_TOKEN_TTL || '2592000', 10),
   },
-  corsOrigins: (process.env.CORS_ORIGINS || 'http://localhost:5173,http://localhost:19006,http://localhost:8081').split(',').map((s) => s.trim()).filter(Boolean),
+  corsOrigins: (process.env.CORS_ORIGINS),
   listingExpiryDays: 30,
 };
 
